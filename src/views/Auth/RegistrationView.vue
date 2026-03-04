@@ -76,13 +76,22 @@ export default {
     }
   },
   methods: {
-    onSubmit(){
-      if (this.$refs.form.validate()){
+    onSubmit() {
+      if (this.$refs.form.validate()) {
         const user = {
           email: this.email,
           password: this.password
         }
-        console.log(user)
+        this.$store.dispatch('registerUser', user)
+        
+        // Очистка формы после отправки
+        this.email = ""
+        this.password = ""
+        this.confirmPassword = ""
+        this.$refs.form.reset()
+        
+        // Перенаправление на главную страницу
+        this.$router.push("/")
       }
     }
   }
