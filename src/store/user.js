@@ -12,7 +12,7 @@ export default {
   },
   mutations: {
     setUser(state, payload) {
-      console.log(payload)
+      console.log('User set:', payload)
       state.user = payload
     }
   },
@@ -30,17 +30,18 @@ export default {
       try {
         if (isRequestOk) {
           await promise
-          commit('setUser', new User(1, email, password))
+          commit('setUser', new User(Date.now(), email, password))
           commit('setLoading', false, { root: true })
+          return Promise.resolve()
         } else {
           await promise
           commit('setLoading', false, { root: true })
           commit('setError', 'Ошибка регистрации', { root: true })
-          throw 'Упс... Ошибка регистрации'
+          throw new Error('Ошибка регистрации')
         }
       } catch (error) {
         commit('setLoading', false, { root: true })
-        commit('setError', error, { root: true })
+        commit('setError', error.message, { root: true })
         throw error
       }
     },
@@ -60,22 +61,30 @@ export default {
           await promise
           commit('setUser', new User(1, email, password))
           commit('setLoading', false, { root: true })
+          return Promise.resolve()
         } else {
           await promise
           commit('setLoading', false, { root: true })
           commit('setError', 'Ошибка логина или пароля', { root: true })
-          throw 'Упс... Ошибка логина или пароля'
+          throw new Error('Ошибка логина или пароля')
         }
       } catch (error) {
         commit('setLoading', false, { root: true })
-        commit('setError', error, { root: true })
+        commit('setError', error.message, { root: true })
         throw error
       }
+    },
+
+    logoutUser({ commit }) {
+      commit('setUser', null)
     }
   },
   getters: {
     user(state) {
       return state.user
+    },
+    isUserLoggedIn(state) {
+      return state.user !== null
     }
   }
 }

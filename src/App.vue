@@ -25,6 +25,16 @@
           </template>
           <v-list-item-title>{{ link.title }}</v-list-item-title>
         </v-list-item>
+        
+        <v-list-item
+          @click="onLogout"
+          v-if="isUserLoggedIn"
+        >
+          <template v-slot:prepend>
+            <v-icon icon="mdi-exit-to-app"></v-icon>
+          </template>
+          <v-list-item-title>Logout</v-list-item-title>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -48,6 +58,14 @@
           <v-icon start :icon="link.icon"></v-icon>
           {{ link.title }}
         </v-btn>
+        
+        <v-btn
+          @click="onLogout"
+          v-if="isUserLoggedIn"
+        >
+          <v-icon start icon="mdi-exit-to-app"></v-icon>
+          Logout
+        </v-btn>
       </v-toolbar-items>
     </v-app-bar>
 
@@ -56,15 +74,16 @@
     </v-main>
 
     <v-snackbar
-      v-model="error"
+      v-model="showError"
       multi-line
-      :timeout="2000"
-      color="primary"
+      :timeout="3000"
+      color="error"
     >
-      {{ error }}
+      {{ errorMessage }}
       
       <template v-slot:actions>
         <v-btn
+          color="white"
           variant="text"
           @click="closeError"
         >
@@ -79,24 +98,48 @@
 export default {
   data() {
     return {
-      drawer: false,
-      links: [
-        { title: "Login", icon: "mdi-lock", url: "/login" },
-        { title: "Registration", icon: "mdi-face", url: "/registration" },
-        { title: "Orders", icon: "mdi-bookmark-multiple-outline", url: "/orders" },
-        { title: "New ad", icon: "mdi-note-plus-outline", url: "/new" },
-        { title: "My ads", icon: "mdi-view-list-outline", url: "/list" }
-      ]
+      drawer: false
     }
   },
   computed: {
-    error() {
+    isUserLoggedIn() {
+      return this.$store.getters.isUserLoggedIn
+    },
+    links() {
+      if (this.isUserLoggedIn) {
+        return [
+          { title: "Orders", icon: "mdi-bookmark-multiple-outline", url: "/orders" },
+          { title: "New ad", icon: "mdi-note-plus-outline", url: "/new" },
+          { title: "My ads", icon: "mdi-view-list-outline", url: "/list" }
+        ]
+      } else {
+        return [
+          { title: "Login", icon: "mdi-lock", url: "/login" },
+          { title: "Registration", icon: "mdi-face", url: "/registration" }
+        ]
+      }
+    },
+    errorMessage() {
       return this.$store.getters.error
+    },
+    showError: {
+      get() {
+        return this.$store.getters.error !== null
+      },
+      set(value) {
+        if (!value) {
+          this.closeError()
+        }
+      }
     }
   },
   methods: {
     closeError() {
       this.$store.dispatch('clearError')
+    },
+    onLogout() {
+      this.$store.dispatch('logoutUser')
+      this.$router.push("/")
     }
   }
 }

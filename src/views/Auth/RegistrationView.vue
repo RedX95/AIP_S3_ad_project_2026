@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" sm="8" lg="6">
-        <v-card class="elevetion-12">
+        <v-card class="elevation-12">
           <v-toolbar dark color="primary">
             <v-toolbar-title>Registration</v-toolbar-title>
           </v-toolbar>
@@ -15,8 +15,9 @@
                 type="email"
                 v-model="email"
                 :rules="emailRules"
-              >
-              </v-text-field>
+                required
+              ></v-text-field>
+              
               <v-text-field
                 prepend-icon="mdi-lock"
                 name="password"
@@ -24,8 +25,9 @@
                 type="password"
                 v-model="password"
                 :rules="passwordRules"
-              >
-              </v-text-field>
+                required
+              ></v-text-field>
+              
               <v-text-field
                 prepend-icon="mdi-lock"
                 name="confirm-password"
@@ -33,8 +35,8 @@
                 type="password"
                 v-model="confirmPassword"
                 :rules="confirmPasswordRules"
-              >
-              </v-text-field>
+                required
+              ></v-text-field>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -56,23 +58,23 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       email: "",
       password: "",
       confirmPassword: "",
       valid: false,
       emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid'
+        v => !!v || "E-mail is required",
+        v => /.+@.+\..+/.test(v) || "E-mail must be valid"
       ],
       passwordRules: [
-        v => !!v || 'Password is required',
-        v => (v && v.length >= 6) || 'Password must be more or equal than 6 characters'
+        v => !!v || "Password is required",
+        v => (v && v.length >= 6) || "Password must be at least 6 characters"
       ],
       confirmPasswordRules: [
-        v => !!v || 'Password is required',
-        v => v === this.password || 'Password should match'
+        v => !!v || "Password confirmation is required",
+        v => v === this.password || "Passwords must match"
       ]
     }
   },
@@ -88,12 +90,12 @@ export default {
           email: this.email,
           password: this.password
         }
-        this.$store.dispatch('registerUser', user)
+        this.$store.dispatch("registerUser", user)
           .then(() => {
             this.$router.push("/")
           })
-          .catch((err) => {
-            console.log(err)
+          .catch(err => {
+            console.log("Registration error:", err)
           })
       }
     }
