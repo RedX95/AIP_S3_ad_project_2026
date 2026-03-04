@@ -88,7 +88,16 @@ export default {
           promo: this.promo,
           src: "https://cdn.vuetifyjs.com/images/cards/cooking.png"
         }
-        console.log(ad)
+        this.$store.dispatch("createAd", ad)
+        
+        // Очистка формы после отправки
+        this.title = ""
+        this.description = ""
+        this.promo = true
+        this.$refs.form.reset()
+        
+        // Перенаправление на главную страницу
+        this.$router.push("/")
       }
     }
   }
