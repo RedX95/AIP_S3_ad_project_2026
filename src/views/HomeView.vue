@@ -36,16 +36,16 @@
               height="200px"
               cover
             ></v-img>
-            <v-card-title primary-title>
+            <v-card-title>
               <div>
                 <h3 class="headline mb-0">{{ ad.title }}</h3>
-                <div>{{ ad.desc }}</div>
+                <div>{{ ad.desc.substring(0, 50) }}...</div>
               </div>
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn text :to="'/ad/' + ad.id">Open</v-btn>
-              <v-btn raised color="primary">Buy</v-btn>
+              <v-btn :to="'/ad/' + ad.id">Open</v-btn>
+              <buy-ad-modal :ad="ad" />
             </v-card-actions>
           </v-card>
         </v-col>

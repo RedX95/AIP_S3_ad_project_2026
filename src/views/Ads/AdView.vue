@@ -27,7 +27,7 @@
               :ad="ad"
               v-if="isOwner"
             />
-            <v-btn class="success" color="green">Buy</v-btn>
+            <buy-ad-modal :ad="ad" />
           </v-card-actions>
         </v-card>
         
