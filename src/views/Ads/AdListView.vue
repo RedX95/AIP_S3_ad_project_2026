@@ -30,6 +30,13 @@
               </p>
               <v-card-actions>
                 <v-spacer></v-spacer>
+                <v-btn 
+                  color="warning" 
+                  variant="text"
+                  :to="'/ad/' + ad.id"
+                >
+                  Edit
+                </v-btn>
                 <v-btn color="primary" variant="text" :to="'/ad/' + ad.id">
                   Open
                 </v-btn>

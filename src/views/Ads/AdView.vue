@@ -9,7 +9,7 @@
           class="d-block mx-auto my-5"
         ></v-progress-circular>
         
-        <v-card class="mt-5" v-else>
+        <v-card class="mt-5" v-else-if="ad">
           <v-img
             height="400px"
             :src="ad.src"
@@ -23,30 +23,31 @@
           
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn 
-              class="warning" 
-              color="orange"
-              @click="openEditDialog"
+            <edit-ad-modal
+              :ad="ad"
               v-if="isOwner"
-            >
-              Edit
-            </v-btn>
+            />
             <v-btn class="success" color="green">Buy</v-btn>
           </v-card-actions>
         </v-card>
+        
+        <div v-else class="text-center my-5">
+          <p class="text--secondary">Ad not found</p>
+          <v-btn color="primary" to="/">Go to Home</v-btn>
+        </div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script>
+import EditAdModal from './EditAdModal.vue'
+
 export default {
-  props: ['id'],
-  data() {
-    return {
-      showEditDialog: false
-    }
+  components: {
+    EditAdModal
   },
+  props: ['id'],
   computed: {
     loading() {
       return this.$store.getters.loading
@@ -57,11 +58,6 @@ export default {
     isOwner() {
       const user = this.$store.getters.user
       return user && this.ad && this.ad.userId === user.id
-    }
-  },
-  methods: {
-    openEditDialog() {
-      this.showEditDialog = true
     }
   }
 }
