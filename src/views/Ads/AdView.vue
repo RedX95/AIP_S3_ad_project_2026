@@ -2,7 +2,14 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <v-card class="mt-5">
+        <v-progress-circular
+          v-if="loading"
+          indeterminate
+          color="primary"
+          class="d-block mx-auto my-5"
+        ></v-progress-circular>
+        
+        <v-card class="mt-5" v-else>
           <v-img
             height="400px"
             :src="ad.src"
@@ -16,7 +23,14 @@
           
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn class="warning" color="orange">Edit</v-btn>
+            <v-btn 
+              class="warning" 
+              color="orange"
+              @click="openEditDialog"
+              v-if="isOwner"
+            >
+              Edit
+            </v-btn>
             <v-btn class="success" color="green">Buy</v-btn>
           </v-card-actions>
         </v-card>
@@ -28,10 +42,26 @@
 <script>
 export default {
   props: ['id'],
+  data() {
+    return {
+      showEditDialog: false
+    }
+  },
   computed: {
+    loading() {
+      return this.$store.getters.loading
+    },
     ad() {
-      const id = this.id
-      return this.$store.getters.adById(id)
+      return this.$store.getters.adById(this.id)
+    },
+    isOwner() {
+      const user = this.$store.getters.user
+      return user && this.ad && this.ad.userId === user.id
+    }
+  },
+  methods: {
+    openEditDialog() {
+      this.showEditDialog = true
     }
   }
 }

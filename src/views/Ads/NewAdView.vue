@@ -4,23 +4,24 @@
       <v-col cols="8" offset="2">
         <h1 class="text--secondary mb-3 mt-3">Create Ad</h1>
         
-        <v-form v-model="valid" ref="form" validation>
+        <v-form v-model="valid" ref="form" lazy-validation>
           <v-text-field
             name="title"
             label="Ad Title"
             type="text"
             v-model="title"
-            :rules="[(v) => !!v || 'Title is required']"
-          >
-          </v-text-field>
+            :rules="[v => !!v || 'Title is required']"
+            required
+          ></v-text-field>
           
           <v-textarea
             name="description"
             label="Ad Description"
             type="text"
             v-model="description"
-            :rules="[(v) => !!v || 'Description is required']"
+            :rules="[v => !!v || 'Description is required']"
             class="mb-3"
+            required
           ></v-textarea>
         </v-form>
 
@@ -39,6 +40,7 @@
               src="https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg"
               height="150"
               class="mt-3"
+              alt="Preview"
             />
           </v-col>
         </v-row>
@@ -58,7 +60,8 @@
             <v-btn
               color="success"
               @click="createAd"
-              :disabled="!valid"
+              :loading="loading"
+              :disabled="!valid || loading"
             >
               Create Ad
             </v-btn>
@@ -71,12 +74,17 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       valid: false,
       title: "",
       description: "",
-      promo: true
+      promo: false
+    }
+  },
+  computed: {
+    loading() {
+      return this.$store.getters.loading
     }
   },
   methods: {
@@ -88,17 +96,22 @@ export default {
           promo: this.promo,
           src: "https://cdn.vuetifyjs.com/images/cards/cooking.png"
         }
+        
         this.$store.dispatch("createAd", ad)
-        
-        // Очистка формы после отправки
-        this.title = ""
-        this.description = ""
-        this.promo = true
-        this.$refs.form.reset()
-        
-        // Перенаправление на главную страницу
-        this.$router.push("/")
+          .then(() => {
+            this.$router.push("/list")
+            this.resetForm()
+          })
+          .catch(err => {
+            console.log("Create ad error:", err)
+          })
       }
+    },
+    resetForm() {
+      this.title = ""
+      this.description = ""
+      this.promo = false
+      this.$refs.form.reset()
     }
   }
 }
