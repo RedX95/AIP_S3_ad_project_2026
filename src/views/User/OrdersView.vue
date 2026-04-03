@@ -4,7 +4,14 @@
       <v-col cols="12" sm="8" lg="6">
         <h1 class="text--secondary mb-3 mt-3">Orders</h1>
         
-        <v-list subheader two-line flat>
+        <v-progress-circular
+          v-if="loading"
+          indeterminate
+          color="primary"
+          class="d-block mx-auto my-5"
+        ></v-progress-circular>
+        
+        <v-list v-else-if="orders.length > 0" subheader two-line flat>
           <v-list-item
             v-for="order in orders"
             :key="order.id"
@@ -12,23 +19,38 @@
             <template v-slot:prepend>
               <v-list-item-action>
                 <v-checkbox
-                  :input-value="order.done"
+                  :model-value="order.done"
                   color="primary"
-                  @click="markDone(order)"
+                  @click="toggleOrderStatus(order)"
+                  :loading="order.updating"
+                  :disabled="order.updating"
                 ></v-checkbox>
               </v-list-item-action>
             </template>
             
-            <v-list-item-title>{{ order.name }}</v-list-item-title>
-            <v-list-item-subtitle>{{ order.phone }}</v-list-item-subtitle>
+            <v-list-item-content>
+              <v-list-item-title>{{ order.name }}</v-list-item-title>
+              <v-list-item-subtitle>{{ order.phone }}</v-list-item-subtitle>
+            </v-list-item-content>
             
             <template v-slot:append>
               <v-list-item-action>
-                <v-btn class="primary" :to="'/ad/' + order.adId">Open</v-btn>
+                <v-btn 
+                  class="primary" 
+                  :to="'/ad/' + order.adId"
+                  :disabled="order.updating"
+                >
+                  Open
+                </v-btn>
               </v-list-item-action>
             </template>
           </v-list-item>
         </v-list>
+        
+        <div v-else-if="!loading" class="text-center my-5">
+          <p class="text--secondary">No orders yet</p>
+          <v-btn color="primary" to="/">Browse ads</v-btn>
+        </div>
       </v-col>
     </v-row>
   </v-container>
@@ -36,37 +58,32 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
-      orders: [
-        {
-          id: "123",
-          name: "Kostya",
-          phone: "+7(978)000-00-05",
-          adId: "1",
-          done: true
-        },
-        {
-          id: "124",
-          name: "Anna",
-          phone: "+7(978)000-00-06",
-          adId: "2",
-          done: false
-        },
-        {
-          id: "125",
-          name: "Maria",
-          phone: "+7(978)000-00-07",
-          adId: "3",
-          done: false
-        }
-      ]
+      updatingOrders: {}
+    }
+  },
+  computed: {
+    loading() {
+      return this.$store.getters.loading
+    },
+    orders() {
+      return this.$store.getters.orders.map(order => ({
+        ...order,
+        updating: this.updatingOrders[order.id] || false
+      }))
     }
   },
   methods: {
-    markDone(order) {
-      order.done = !order.done;
-      console.log(order.done);
+    toggleOrderStatus(order) {
+      // Устанавливаем флаг обновления для этого заказа
+      this.$set(this.updatingOrders, order.id, true)
+      
+      this.$store.dispatch("markOrderDone", order.id)
+        .finally(() => {
+          // Снимаем флаг обновления
+          this.$set(this.updatingOrders, order.id, false)
+        })
     }
   }
 }
